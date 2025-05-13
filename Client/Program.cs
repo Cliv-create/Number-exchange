@@ -4,6 +4,8 @@
     using System.Net;
     using System.Text;
     using Spectre.Console;
+    using System.Diagnostics;
+    using System.Net.Security;
 
     public static class Logger
     {
@@ -69,11 +71,31 @@
     {
         private const int DEFAULT_BUFLEN = 512;
         private const string DEFAULT_PORT = "27015";
+        private const string SERVER_LOCATION = "";
 
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8; // кириллица
             Console.Title = "CLIENT SIDE";
+
+            try
+            {
+                var processes = Process.GetProcessesByName("SERVER SIDE");
+                if (processes.Length == 0)
+                {
+                    Process server = new Process();
+
+                    server.StartInfo.UseShellExecute = true;
+                    server.StartInfo.FileName = SERVER_LOCATION;
+
+                    if (server.Start()) Logger.LogNotice("Started server process successfully!");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.Message);
+            }
+
             try
             {
                 var ipAddress = IPAddress.Loopback; // IP-адрес локального хоста (127.0.0.1), который используется для подключения к серверу на текущем устройстве
